@@ -1,94 +1,107 @@
-# -------------------------
-# Tic Tac Toe - Clean Version
-# -------------------------
-
-def print_grid(grid):
-    for i in range(3):
-        print("|", end="")
-        for j in range(3):
-            print(grid[i][j], "|", end="")
-        print()
+# Function to display the board in a clean format
+def show_board(board):
+    for row in board:
+        print("| " + " | ".join(row) + " |")
+    print()
 
 
-def check_winner(grid, player_symbol):
-    # Rows and Columns
-    for i in range(3):
-        if all(grid[i][j] == player_symbol for j in range(3)):  # Row check
-            return True
-        if all(grid[j][i] == player_symbol for j in range(3)):  # Column check
+# Function to check if a player has won
+def has_won(board, symbol):
+    # Check rows
+    for r in range(3):
+        if board[r] == [symbol, symbol, symbol]:
             return True
 
-    # Diagonals
-    if all(grid[i][i] == player_symbol for i in range(3)):
+    # Check columns
+    for c in range(3):
+        if board[0][c] == symbol and board[1][c] == symbol and board[2][c] == symbol:
+            return True
+
+    # Check diagonals
+    if board[0][0] == symbol and board[1][1] == symbol and board[2][2] == symbol:
         return True
-    if all(grid[i][2 - i] == player_symbol for i in range(3)):
+
+    if board[0][2] == symbol and board[1][1] == symbol and board[2][0] == symbol:
         return True
 
     return False
 
 
-def is_full(grid):
-    return all(grid[i][j] != " " for i in range(3) for j in range(3))
+# Function to verify if board is full
+def board_filled(board):
+    for row in board:
+        for cell in row:
+            if cell == " ":
+                return False
+    return True
 
 
-def play_game():
-    print("Welcome to Tic-Tac-Toe!\n")
+# Main game function
+def start_game():
+    print("=== TIC TAC TOE ===\n")
 
-    # Initialize grid
-    grid = [[" " for _ in range(3)] for _ in range(3)]
+    # Empty 3x3 board
+    board = [[" " for _ in range(3)] for _ in range(3)]
 
-    # Player setup
-    player1 = input("Enter name of Player 1: ")
-    player1_symbol = input("Enter symbol for Player 1: ")
-    player2 = input("Enter name of Player 2: ")
-    player2_symbol = input("Enter symbol for Player 2: ")
+    # Player details
+    p1_name = input("Player 1 name: ")
+    p1_symbol = input("Player 1 symbol: ")
 
-    print("\nStarting Game!\n")
-    print_grid(grid)
+    p2_name = input("Player 2 name: ")
+    p2_symbol = input("Player 2 symbol: ")
 
-    turn_player1 = True
+    print("\nGame Started!\n")
+    show_board(board)
 
+    current_player = p1_name
+    current_symbol = p1_symbol
+
+    # Actual game loop
     while True:
-        current_player = player1 if turn_player1 else player2
-        current_symbol = player1_symbol if turn_player1 else player2_symbol
+        print(f"{current_player}'s turn ({current_symbol})")
 
-        print(f"\nIt's {current_player}'s turn ({current_symbol})")
+        # Take user move
+        move = input("Enter position (1–9): ")
 
-        # Take input
-        try:
-            cell = int(input("Choose a cell (1–9): "))
-            if not (1 <= cell <= 9):
-                print("❌ Invalid cell number! Choose between 1–9.")
-                continue
-        except ValueError:
-            print("❌ Please enter a valid number!")
+        if not move.isdigit():
+            print("Invalid input. Enter a number from 1 to 9.\n")
             continue
 
-        # Convert to grid index
-        i, j = divmod(cell - 1, 3)
+        move = int(move)
 
-        if grid[i][j] != " ":
-            print("❌ That cell is already taken! Try again.")
+        if move < 1 or move > 9:
+            print("Choose a number between 1 and 9.\n")
             continue
 
-        # Make move
-        grid[i][j] = current_symbol
-        print_grid(grid)
+        row, col = (move - 1) // 3, (move - 1) % 3
 
-        # Check winner
-        if check_winner(grid, current_symbol):
-            print(f"\n🏆 {current_player} wins the game!")
+        if board[row][col] != " ":
+            print("Cell already used. Try again.\n")
+            continue
+
+        # Update board
+        board[row][col] = current_symbol
+        show_board(board)
+
+        # Winner check
+        if has_won(board, current_symbol):
+            print(f"*** {current_player} wins the match! ***")
             break
 
-        # Check draw
-        if is_full(grid):
-            print("\nIt's a draw! No more moves left.")
+        # Draw check
+        if board_filled(board):
+            print("Match Drawn. Board is full!")
             break
 
-        # Switch turn
-        turn_player1 = not turn_player1
+        # Switch player manually with if/else
+        if current_player == p1_name:
+            current_player = p2_name
+            current_symbol = p2_symbol
+        else:
+            current_player = p1_name
+            current_symbol = p1_symbol
 
 
-# Run the game
-if __name__ == "__main__":
-    play_game()
+# Start the game
+start_game()
+
